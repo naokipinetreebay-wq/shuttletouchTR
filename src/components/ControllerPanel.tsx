@@ -4,6 +4,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useMemo, useState } from "react";
 import { SessionExit } from "@/components/SessionExit";
 import type { ClientMessage, PlayMode, RoomConfig, RoomSnapshot } from "@/lib/types";
+import { displayJoinUrl } from "@/lib/roomCode";
 
 function formatSeconds(ms: number): string {
   return (ms / 1000).toFixed(2);
@@ -24,7 +25,7 @@ export function ControllerPanel({
   const battle = cfg.mode === "battle";
   const displayUrl = useMemo(() => {
     if (typeof window === "undefined") return "";
-    return `${window.location.origin}/d/?code=${snapshot.code}`;
+    return displayJoinUrl(snapshot.code);
   }, [snapshot.code]);
 
   const [, setTick] = useState(0);

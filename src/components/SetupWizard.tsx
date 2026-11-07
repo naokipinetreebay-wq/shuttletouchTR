@@ -8,6 +8,7 @@ import {
 } from "@/components/ControllerRoleChoice";
 import { SessionExit } from "@/components/SessionExit";
 import type { ClientMessage, PlayMode, RoomConfig, RoomSnapshot } from "@/lib/types";
+import { displayJoinUrl } from "@/lib/roomCode";
 
 const STEPS = ["説明", "役割", "設定", "端末", "確認"] as const;
 
@@ -31,7 +32,7 @@ export function SetupWizard({
   const battle = cfg.mode === "battle";
   const displayUrl = useMemo(() => {
     if (typeof window === "undefined") return "";
-    return `${window.location.origin}/d/?code=${snapshot.code}`;
+    return displayJoinUrl(snapshot.code);
   }, [snapshot.code]);
 
   const patch = (partial: Partial<RoomConfig>) => {
