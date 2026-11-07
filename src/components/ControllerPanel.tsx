@@ -24,7 +24,7 @@ export function ControllerPanel({
   const battle = cfg.mode === "battle";
   const displayUrl = useMemo(() => {
     if (typeof window === "undefined") return "";
-    return `${window.location.origin}/d/${snapshot.code}`;
+    return `${window.location.origin}/d/?code=${snapshot.code}`;
   }, [snapshot.code]);
 
   const [, setTick] = useState(0);
