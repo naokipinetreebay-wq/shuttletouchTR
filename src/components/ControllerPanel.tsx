@@ -1,5 +1,7 @@
 "use client";
 
+import { NumberSelect } from "@/components/NumberSelect";
+
 import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useMemo, useState } from "react";
 import { SessionExit } from "@/components/SessionExit";
@@ -126,13 +128,12 @@ export function ControllerPanel({
           </label>
           <label className="field">
             <span>回数: {cfg.targetCount}</span>
-            <input
-              type="range"
+            <NumberSelect
               min={5}
               max={50}
               step={1}
               value={cfg.targetCount}
-              onChange={(e) => patch({ targetCount: Number(e.target.value) })}
+              onChange={(n) => patch({ targetCount: n })}
             />
           </label>
           <p className="muted">
