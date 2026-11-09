@@ -1,16 +1,17 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { ClientMessage, RoomSnapshot } from "@/lib/types";
+import type { RoomSnapshot } from "@/lib/types";
 
 export function DisplayScreen({
   snapshot,
   deviceId,
-  send,
+  sendGame,
 }: {
   snapshot: RoomSnapshot;
   deviceId: string;
-  send: (msg: ClientMessage) => void;
+  /** DataChannel 優先、なければ WS tap */
+  sendGame: (msg: unknown) => boolean;
 }) {
   const mine = snapshot.displays.find((d) => d.id === deviceId);
   const light = mine?.light ?? "off";
@@ -46,7 +47,7 @@ export function DisplayScreen({
     lock.current = now;
     setFlash(true);
     window.setTimeout(() => setFlash(false), 120);
-    send({ type: "tap", deviceId });
+    sendGame({ type: "clientEvent", event: "tap", deviceId });
   };
 
   const seconds =

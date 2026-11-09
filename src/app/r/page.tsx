@@ -105,7 +105,7 @@ export default function ControllerPage() {
         <DisplayScreen
           snapshot={displaySock.snapshot}
           deviceId={displayId}
-          send={displaySock.send}
+          sendGame={displaySock.sendGame}
         />
         <button type="button" className="ctrl-return-bar" onClick={() => setView("control")}>
           コントローラに戻る
