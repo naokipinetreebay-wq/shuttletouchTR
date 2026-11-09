@@ -17,11 +17,15 @@ export function ControllerPanel({
   connected,
   send,
   clearSessionKeys,
+  onStart,
+  onStop,
 }: {
   snapshot: RoomSnapshot;
   connected: boolean;
   send: (msg: ClientMessage) => void;
   clearSessionKeys?: string[];
+  onStart?: () => void;
+  onStop?: () => void;
 }) {
   const cfg = snapshot.config;
   const battle = cfg.mode === "battle";
@@ -108,11 +112,15 @@ export function ControllerPanel({
               type="button"
               className="btn primary"
               disabled={needAnother}
-              onClick={() => send({ type: "start" })}
+              onClick={() => (onStart ? onStart() : send({ type: "start", local: true }))}
             >
               {snapshot.finishedAt != null || snapshot.winner ? "もう一度" : "開始"}
             </button>
-            <button type="button" className="btn danger" onClick={() => send({ type: "stop" })}>
+            <button
+              type="button"
+              className="btn danger"
+              onClick={() => (onStop ? onStop() : send({ type: "stop" }))}
+            >
               一時停止
             </button>
           </div>
@@ -170,7 +178,10 @@ export function ControllerPanel({
         )}
       </section>
 
-      <SessionExit onStop={() => send({ type: "stop" })} clearSessionKeys={clearSessionKeys} />
+      <SessionExit
+        onStop={() => (onStop ? onStop() : send({ type: "stop" }))}
+        clearSessionKeys={clearSessionKeys}
+      />
     </div>
   );
 }

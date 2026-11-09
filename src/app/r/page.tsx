@@ -5,6 +5,7 @@ import { ControllerPanel } from "@/components/ControllerPanel";
 import type { ControllerRoleMode } from "@/components/ControllerRoleChoice";
 import { DisplayScreen } from "@/components/DisplayScreen";
 import { SetupWizard } from "@/components/SetupWizard";
+import { useShuttleLocalHost, type ShuttleClientEvent } from "@/lib/localHost";
 import { useRoomCode } from "@/lib/roomCode";
 import { useDeviceId, useRoomSocket } from "@/lib/ws";
 
@@ -12,7 +13,15 @@ export default function ControllerPage() {
   const code = useRoomCode();
   const deviceId = useDeviceId(`controller-${code}`);
   const displayId = useDeviceId(`controller-as-display-${code}`);
-  const { snapshot, error, connected, send } = useRoomSocket(code, "controller", deviceId);
+  const onClientEventRef = useRef<(ev: ShuttleClientEvent) => void>(() => undefined);
+  const { snapshot, error, connected, send } = useRoomSocket(
+    code,
+    "controller",
+    deviceId,
+    (ev) => onClientEventRef.current(ev)
+  );
+  const { startLocal, stopLocal, onClientEvent } = useShuttleLocalHost(snapshot, send);
+  onClientEventRef.current = onClientEvent;
 
   const wizardKey = `st-wizard-done-${code}`;
   const roleKey = `st-ctrl-role-${code}`;
@@ -46,8 +55,8 @@ export default function ControllerPage() {
     if (alsoDisplay && !snapshot.displays.some((d) => d.id === displayId)) return;
     if (snapshot.config.mode === "battle" && snapshot.displays.length < 2) return;
     pendingStart.current = false;
-    send({ type: "start" });
-  }, [alsoDisplay, displayId, ready, send, snapshot]);
+    startLocal();
+  }, [alsoDisplay, displayId, ready, snapshot, startLocal]);
 
   if (error && !snapshot) {
     return (
@@ -112,6 +121,11 @@ export default function ControllerPage() {
         connected={connected}
         send={send}
         clearSessionKeys={[wizardKey, roleKey]}
+        onStart={() => {
+          startLocal();
+          if (alsoDisplay) setView("display");
+        }}
+        onStop={stopLocal}
       />
       <div className="controller" style={{ paddingTop: 0, gap: 10 }}>
         {alsoDisplay ? (
